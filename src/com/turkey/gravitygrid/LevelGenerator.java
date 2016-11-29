@@ -411,7 +411,6 @@ public class LevelGenerator {
         // Sometimes we might move the same tile a few times, other times we might just move other tiles. Who knows.
 
 
-
         for(int i=0; i<complexity; i++) {
 
             int selectedValue = 0;  // the value of the selected tile
@@ -516,20 +515,37 @@ public class LevelGenerator {
         if(genAsteroids) {
             // Suns are not generated if complexity < 2
             // Asteroids will show up anytime
-            int numAsteroids = (int) Math.log((double) ThreadLocalRandom.current().nextInt(1, complexity + 1) * (numRedNeeded + numBlueNeeded + numGreenNeeded)); // gen number of asteroids
 
-            for (int a = 0; a < numAsteroids; a++) {
+            // First figure out how many possible total asteroids we can get
+            ArrayList<Integer> possibleAsteroids = new ArrayList<Integer>();
 
-                int rand = ThreadLocalRandom.current().nextInt(0, 48);
+            for(int a=0; a<49; a++) {
+                if(levelFlagged[a] == 0) {
+                    possibleAsteroids.add(a);
+                }
+            }
 
-                boolean placed = false;
-                while (!placed) {
-                    if (levelFlagged[rand] == 0) {
-                        // This tile has never been used. Stick an asteroid there!
-                        tile.get(rand).type = TileType.ASTEROID;
-                        placed = true;
+            // Now, every possibleAsteroids element is a tile that can be set to an asteroid if we want
+
+            if(possibleAsteroids.size() > 0) {
+                int numAsteroids = ThreadLocalRandom.current().nextInt(1, possibleAsteroids.size()); //(int) Math.log((double) ThreadLocalRandom.current().nextInt(1, complexity + 1) * (numRedNeeded + numBlueNeeded + numGreenNeeded)); // gen number of asteroids
+
+                for (int a = 0; a < numAsteroids; a++) {
+
+                    int rand = possibleAsteroids.get(ThreadLocalRandom.current().nextInt(0, possibleAsteroids.size()));
+                    System.out.println("Trying to put an asteroid at tile " + rand + "...");
+
+                    boolean placed = false;
+                    while (!placed) {
+                        if (levelFlagged[rand] == 0) {
+                            // This tile has never been used. Stick an asteroid there!
+                            tile.get(rand).type = TileType.ASTEROID;
+                            placed = true;
+                        }
                     }
                 }
+            } else {
+                System.out.println("I was told to place asteroids, but there's no spot for asteroids!");
             }
         }
 
