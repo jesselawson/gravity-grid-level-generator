@@ -549,48 +549,142 @@ public class LevelGenerator {
             }
         }
 
-
         if(genSuns) {
-            // ASSUMED, I will hand-draw any levels that contain more than one sun,
-            // Let's now look for the first possible location for a sun
-            // 42 43 44 45 46 47 48
-            // 35 36 37 38 39 40 41
-            // 28 29 30 31 32 33 34
-            // 21 22 23 24 25 26 27
-            // 14 15 16 17 18 19 20
-            // 07 08 09 10 11 12 13
-            // 00 01 02 03 04 05 06
 
-            // You only have to search through the tiles in boardMiddle.
-            // Set max suns, otherwise we'll have a bunch of suns!
-            int maxSuns = ThreadLocalRandom.current().nextInt(1, 3);
-            int numSuns = 0;
-            placeSuns:
-            for (int theTile : boardMiddle) {
-                // Check all surrounding tiles and see if they're blank. If they are, stick a sun down.
-                if (tile.get(theTile - 1).type == TileType.NONE &&
-                        tile.get(theTile - 6).type == TileType.NONE &&
-                        tile.get(theTile - 7).type == TileType.NONE &&
-                        tile.get(theTile - 8).type == TileType.NONE &&
-                        tile.get(theTile + 1).type == TileType.NONE &&
-                        tile.get(theTile + 6).type == TileType.NONE &&
-                        tile.get(theTile + 7).type == TileType.NONE &&
-                        tile.get(theTile + 8).type == TileType.NONE) {
-                    tile.get(theTile - 1).type = TileType.BLOCKED;
-                    tile.get(theTile - 6).type = TileType.BLOCKED;
-                    tile.get(theTile - 7).type = TileType.BLOCKED;
-                    tile.get(theTile - 8).type = TileType.BLOCKED;
-                    tile.get(theTile + 1).type = TileType.BLOCKED;
-                    tile.get(theTile + 6).type = TileType.BLOCKED;
-                    tile.get(theTile + 7).type = TileType.BLOCKED;
-                    tile.get(theTile + 7).type = TileType.BLOCKED;
-                    tile.get(theTile).type = TileType.SUN;
+            // First figure out how many possible total suns we can get
+            ArrayList<Integer> possibleSuns = new ArrayList<Integer>();
+
+            for(int a=0; a<49; a++) {
+
+                if(IntArrayContains(boardEdge, a)) {
+                    // Check for squares specially
+                    switch (a) {
+                        case 42: if(levelFlagged[35] == 0 && levelFlagged[43] == 0 && levelFlagged[36] == 0) { possibleSuns.add(a); } break;
+                        case 43:
+                        case 44:
+                        case 45:
+                        case 46:
+                        case 47: if(levelFlagged[a-1] == 0 && levelFlagged[a+1] == 0 && levelFlagged[a-6] == 0 && levelFlagged[a-7] == 0 && levelFlagged[a-8] == 0) { possibleSuns.add(a); } break;
+                        case 48: if(levelFlagged[47] == 0 && levelFlagged[40] == 0 && levelFlagged[41] == 0) { possibleSuns.add(a); } break;
+                        case 41:
+                        case 34:
+                        case 27:
+                        case 20:
+                        case 13: if(levelFlagged[a+6] == 0 && levelFlagged[a+1] == 0 && levelFlagged[a+7] == 0 && levelFlagged[a-1] == 0 && levelFlagged[a-6] == 0 && levelFlagged[a-7] == 0) { possibleSuns.add(a); } break;
+                        case  6: if(levelFlagged[5] == 0 && levelFlagged[12] == 0 && levelFlagged[13] == 0) { possibleSuns.add(a); } break;
+                        case  5:
+                        case  4:
+                        case  3:
+                        case  2:
+                        case  1: if(levelFlagged[a+6] == 0 && levelFlagged[a+7] == 0 && levelFlagged[a+8] == 0 && levelFlagged[a-1] == 0 && levelFlagged[a+1] == 0) { possibleSuns.add(a); } break;
+                        case  0: if(levelFlagged[7] == 0 && levelFlagged[8] == 0 && levelFlagged[1] == 0) { possibleSuns.add(a); } break;
+                        case  7:
+                        case 14:
+                        case 21:
+                        case 28:
+                        case 35: if(levelFlagged[a+6] == 0 && levelFlagged[a+7] == 0 && levelFlagged[a+1] == 0 && levelFlagged[a-6] == 0 && levelFlagged[a-7] == 0) { possibleSuns.add(a); } break;
+                        default: break;
+                    }
+                } else if (IntArrayContains(boardMiddle, a)) {
+                    // Check the middle section of the board (i.e., all tiles except edges and corners)
+                    if (    // For green planets, it's left, right, and all three on top and three on bottom
+                            levelFlagged[a-1] == 0 &&
+                            levelFlagged[a+1] == 0 &&
+                            levelFlagged[a-6] == 0 &&
+                            levelFlagged[a-7] == 0 &&
+                            levelFlagged[a-8] == 0 &&
+                            levelFlagged[a+6] == 0 &&
+                            levelFlagged[a+7] == 0 &&
+                            levelFlagged[a+8] == 0
+                            ) {
+                        possibleSuns.add(a);
+                    }
+                } else {
+                    // do nothing
                 }
-                numSuns++;
-                if (numSuns >= maxSuns) {
-                    break placeSuns;
-                }
-            }   // Done placing sun
+            }
+
+            // Now, every possibleSuns element is a tile that can be set to an asteroid if we want
+
+            if(possibleSuns.size() > 0) {
+                int numSuns = (possibleSuns.size() == 1 ? 1 : ThreadLocalRandom.current().nextInt(1, possibleSuns.size())); //(int) Math.log((double) ThreadLocalRandom.current().nextInt(1, complexity + 1) * (numRedNeeded + numBlueNeeded + numGreenNeeded)); // gen number of asteroids
+
+                for (int a = 0; a < numSuns; a++) {
+
+                    int rand = possibleSuns.get(ThreadLocalRandom.current().nextInt(0, possibleSuns.size()));
+                    System.out.println("Trying to put a sun at tile " + rand + "...");
+
+                    boolean placed = false;
+                    while (!placed) {
+                        if(IntArrayContains(boardEdge, a)) {
+                            // Check for squares specially
+                            switch (rand) {
+                                case 42: if(levelFlagged[35] == 0 && levelFlagged[43] == 0 && levelFlagged[36] == 0) { tile.get(rand).type = TileType.SUN;tile.get(35).type = TileType.BLOCKED;tile.get(43).type = TileType.BLOCKED;tile.get(36).type = TileType.BLOCKED;placed = true; } break;
+                                case 43:
+                                case 44:
+                                case 45:
+                                case 46:
+                                case 47: if(levelFlagged[rand-1] == 0 && levelFlagged[rand+1] == 0 && levelFlagged[rand-6] == 0 && levelFlagged[rand-7] == 0 && levelFlagged[rand-8] == 0) {
+                                    tile.get(rand).type = TileType.SUN;
+                                    tile.get(rand-1).type = TileType.BLOCKED;tile.get(rand+1).type = TileType.BLOCKED;tile.get(rand-6).type = TileType.BLOCKED;tile.get(rand-7).type = TileType.BLOCKED;tile.get(rand-8).type = TileType.BLOCKED; placed = true;; } break;
+                                case 48: if(levelFlagged[47] == 0 && levelFlagged[40] == 0 && levelFlagged[41] == 0) {
+                                    tile.get(rand).type = TileType.SUN;tile.get(47).type = TileType.BLOCKED;tile.get(40).type = TileType.BLOCKED;tile.get(41).type = TileType.BLOCKED;placed = true; } break;
+                                case 41:
+                                case 34:
+                                case 27:
+                                case 20:
+                                case 13: if(levelFlagged[rand+6] == 0 && levelFlagged[rand+1] == 0 && levelFlagged[rand+7] == 0 && levelFlagged[rand-1] == 0 && levelFlagged[rand-6] == 0 && levelFlagged[rand-7] == 0) {
+                                    tile.get(rand).type = TileType.SUN;tile.get(rand+6).type = TileType.BLOCKED;tile.get(rand+1).type = TileType.BLOCKED;tile.get(rand+7).type = TileType.BLOCKED;tile.get(rand-1).type = TileType.BLOCKED;tile.get(rand-6).type = TileType.BLOCKED;tile.get(rand-7).type = TileType.BLOCKED;placed = true; } break;
+                                case  6: if(levelFlagged[5] == 0 && levelFlagged[12] == 0 && levelFlagged[13] == 0) {
+                                    tile.get(rand).type = TileType.SUN;tile.get(5).type = TileType.BLOCKED;tile.get(12).type = TileType.BLOCKED;tile.get(13).type = TileType.BLOCKED;placed = true; } break;
+                                case  5:
+                                case  4:
+                                case  3:
+                                case  2:
+                                case  1: if(levelFlagged[rand+6] == 0 && levelFlagged[rand+7] == 0 && levelFlagged[rand+8] == 0 && levelFlagged[rand-1] == 0 && levelFlagged[rand+1] == 0) {
+                                    tile.get(rand).type = TileType.SUN;tile.get(rand+6).type = TileType.BLOCKED;tile.get(rand+7).type = TileType.BLOCKED;tile.get(rand+8).type = TileType.BLOCKED;tile.get(rand-1).type = TileType.BLOCKED;tile.get(rand+1).type = TileType.BLOCKED;placed = true; } break;
+                                case  0: if(levelFlagged[7] == 0 && levelFlagged[8] == 0 && levelFlagged[1] == 0) {
+                                    tile.get(rand).type = TileType.SUN;tile.get(7).type = TileType.BLOCKED;tile.get(8).type = TileType.BLOCKED;tile.get(1).type = TileType.BLOCKED;placed = true; } break;
+                                case  7:
+                                case 14:
+                                case 21:
+                                case 28:
+                                case 35: if(levelFlagged[rand+6] == 0 && levelFlagged[rand+7] == 0 && levelFlagged[rand+1] == 0 && levelFlagged[rand-6] == 0 && levelFlagged[rand-7] == 0) {
+                                    tile.get(rand).type = TileType.SUN;tile.get(rand+6).type = TileType.BLOCKED;tile.get(rand+7).type = TileType.BLOCKED;tile.get(rand+1).type = TileType.BLOCKED;tile.get(rand-6).type = TileType.BLOCKED;tile.get(rand-7).type = TileType.BLOCKED;placed = true; } break;
+                                default: break;
+                            }
+                        } else if (IntArrayContains(boardMiddle, a)) {
+                            // Check the middle section of the board (i.e., all tiles except edges and corners)
+                            if (    // For green planets, it's left, right, and all three on top and three on bottom
+                                    levelFlagged[rand-1] == 0 &&
+                                            levelFlagged[rand+1] == 0 &&
+                                            levelFlagged[rand-6] == 0 &&
+                                            levelFlagged[rand-7] == 0 &&
+                                            levelFlagged[rand-8] == 0 &&
+                                            levelFlagged[rand+6] == 0 &&
+                                            levelFlagged[rand+7] == 0 &&
+                                            levelFlagged[rand+8] == 0
+                                    ) {
+                                tile.get(rand).type = TileType.SUN;
+                                tile.get(rand+6).type = TileType.BLOCKED;
+                                tile.get(rand+7).type = TileType.BLOCKED;
+                                tile.get(rand+8).type = TileType.BLOCKED;
+                                tile.get(rand-1).type = TileType.BLOCKED;
+                                tile.get(rand+1).type = TileType.BLOCKED;
+                                tile.get(rand-6).type = TileType.BLOCKED;
+                                tile.get(rand-7).type = TileType.BLOCKED;
+                                tile.get(rand-8).type = TileType.BLOCKED;
+                                
+                                        placed = true;
+                            }
+                        } else {
+                            // do nothing
+                        }
+                        }
+                    }
+                } else {
+                System.out.println("I was told to place suns, but there's no spot for suns!");
+            }
         }
 
         // Finally, let's construct the actual level string

@@ -10,7 +10,7 @@ public class Main {
 
         levelGenerator = new LevelGenerator();
 
-        level = levelGenerator.GenerateLevel(3,0,0,7, false, false);
+        level = levelGenerator.GenerateLevel(8,5,5,5, false, false);
 
     }
 
