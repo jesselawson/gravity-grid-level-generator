@@ -15,6 +15,8 @@ import java.util.ArrayList;
 
 public class LevelGenerator {
 
+    public boolean debug = false;
+
     /* Board components. Helps differentiate between edges/corners and middle of board. */
     private static final int[] boardMiddle = new int[] { 36,37,38,39,40,29,30,31,32,33,22,23,24,25,26,15,16,17,18,19,8,9,10,11,12 };
     private static final int[] boardEdge = new int[] { 42,43,44,45,46,47,48,35,28,21,14,7,0,1,2,3,4,5,6,13,20,27,34,41 };
@@ -54,7 +56,9 @@ public class LevelGenerator {
 
     public boolean GoodMoveVerified(ArrayList<Tile> tile, int tileToCheck, TileType selectedType, int selectedNum) {
         if( tile.get(tileToCheck).type == selectedType && tile.get(tileToCheck).tileNum != selectedNum ) {
-            System.out.println("(3/4): Good tile "+tileToCheck+" found for selected num "+selectedNum);
+            if(debug){
+                System.out.println("(3/4): Good tile "+tileToCheck+" found for selected num "+selectedNum);
+            }
             return true;
         } else {
             return false;
@@ -79,7 +83,9 @@ public class LevelGenerator {
                 // Extract the type of the selected tile so we can assign the appropriate rules to the planet type
                 selectedType = theTile.type;
                 selectedNum = theTile.tileNum;
-                System.out.println("(2/4): canMoveAccordingToRules: Tile #"+selectedNum+" ("+selectedType+") is selected. Trying to move to "+destinationTileNum+"...");
+                if(debug){
+                    System.out.println("(2/4): canMoveAccordingToRules: Tile #"+selectedNum+" ("+selectedType+") is selected. Trying to move to "+destinationTileNum+"...");
+                }
                 break findSelected;
             }
         }
@@ -99,7 +105,9 @@ public class LevelGenerator {
                                     || (GoodMoveVerified(tile,destinationTileNum - 6, selectedType, selectedNum))
                                     || (GoodMoveVerified(tile,destinationTileNum - 8, selectedType, selectedNum))) {
                         outcome = true;
-                        System.out.println("destinationTileNum: " + destinationTileNum + ". SelectedNum: " + selectedNum);
+                        if(debug){
+                            System.out.println("destinationTileNum: " + destinationTileNum + ". SelectedNum: " + selectedNum);
+                        }
                         return outcome; // Leave this function immediately!
                     }
 
@@ -149,7 +157,9 @@ public class LevelGenerator {
                                     || (GoodMoveVerified(tile,destinationTileNum + 7, selectedType, selectedNum))
                                     || (GoodMoveVerified(tile,destinationTileNum - 7, selectedType, selectedNum))) {
                         outcome = true;
-                        System.out.println("destinationTileNum: " + destinationTileNum + ". SelectedNum: " + selectedNum);
+                        if(debug){
+                            System.out.println("destinationTileNum: " + destinationTileNum + ". SelectedNum: " + selectedNum);
+                        }
                         return outcome; // Leave this function immediately!
                     }
 
@@ -205,7 +215,9 @@ public class LevelGenerator {
                                     && !GoodMoveVerified(tile,destinationTileNum + 8, selectedType, selectedNum)
                             ) {
                         outcome = true;
-                        System.out.println("destinationTileNum: " + destinationTileNum + ". SelectedNum: " + selectedNum);
+                        if(debug){
+                            System.out.println("destinationTileNum: " + destinationTileNum + ". SelectedNum: " + selectedNum);
+                        }
                         return outcome; // Leave this function immediately!
                     }
 
@@ -246,7 +258,9 @@ public class LevelGenerator {
 
                 break;
             default:
-                System.out.println("canMoveAccordingToRules: No Planet Type understood!");
+                if(debug){
+                    System.out.println("canMoveAccordingToRules: No Planet Type understood!");
+                }
                 break;
         }
         return outcome;
@@ -269,7 +283,20 @@ public class LevelGenerator {
         int thisLevelCurrentBlueTotal = 0;
         int thisLevelCurrentGreenTotal = 0;
 
+        // This will be the final level we deliver to the player.
         int[] levelFinal = {
+                0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0
+        };
+
+        // This will hold the solution to levelFinal
+        int[] levelSolution = {
                 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0,
@@ -298,7 +325,9 @@ public class LevelGenerator {
 
         int tileNum = 0;
 
-        System.out.println("Creating new level.");
+        if(debug){
+            System.out.println("Creating new level.");
+        }
 
         // Instantiate a dummy map to use
         for(int r = 6; r > -1; r--) {
@@ -308,7 +337,9 @@ public class LevelGenerator {
             }
         }
 
-        System.out.println("Map array instantiated.");
+        if(debug){
+            System.out.println("Map array instantiated.");
+        }
 
         // Now we have an ArrayList full of tiles. Let's stick some tiles in there.
 
@@ -316,7 +347,9 @@ public class LevelGenerator {
         int numBlueTiles = blueWeight;//(blueWeight > 0 ? ThreadLocalRandom.current().nextInt(0,blueWeight) : 0);
         int numGreenTiles = greenWeight;//(greenWeight > 0 ? ThreadLocalRandom.current().nextInt(0,greenWeight) : 0);
 
-        System.out.println("Creating new level with "+numRedTiles+" red, "+numBlueTiles+" blue, and "+numGreenTiles+" green.");
+        if(debug){
+            System.out.println("Creating new level with "+numRedTiles+" red, "+numBlueTiles+" blue, and "+numGreenTiles+" green.");
+        }
 
         // Now, randomly go through the level map and place a random tile
         // Start with red
@@ -332,7 +365,9 @@ public class LevelGenerator {
             }
         }
 
-        System.out.println("Red tiles handled.");
+        if(debug){
+            System.out.println("Red tiles handled.");
+        }
 
         // Next up is blue
         for(int a=0; a<(numBlueTiles); a++) {
@@ -347,7 +382,9 @@ public class LevelGenerator {
             }
         }
 
-        System.out.println("Blue tiles handled.");
+        if(debug){
+            System.out.println("Blue tiles handled.");
+        }
 
         // Finally, we do green
         for(int a=0; a<(numGreenTiles); a++) {
@@ -362,55 +399,64 @@ public class LevelGenerator {
             }
         }
 
-        System.out.println("Green tiles handled.");
+        if(debug){
+            System.out.println("Green tiles handled.");
+        }
 
         // At this point, we have a map with random planets everywhere, and the levelFlagged has been updated.
         // This representation of the planets is going to give us the level value totals to strive for after we have moved the planets
         // around a bit.
 
-        // We can get the values needed for each planet color for the level now.
-        // Flush the current scores
-        numRedNeeded = 0;
-        numBlueNeeded = 0;
-        numGreenNeeded = 0;
-        thisLevelCurrentGreenTotal = 0;
-        thisLevelCurrentRedTotal = 0;
-        thisLevelCurrentBlueTotal = 0;
+
+
         // Also, we should update our value totals that we'll use below during our complexity movements
         // Flush the current scores
-        thisLevelCurrentBlueTotal = 0;
-        thisLevelCurrentRedTotal = 0;
-        thisLevelCurrentGreenTotal = 0;
 
-        // Iterate through each tile and update the current color values
-        for(Tile theTile : tile) {
-            switch(theTile.type) {
-                case REDPLANET:
-                    thisLevelCurrentRedTotal += theTile.value;
-                    break;
-                case BLUEPLANET:
-                    thisLevelCurrentBlueTotal += theTile.value;
-                    break;
-                case GREENPLANET:
-                    thisLevelCurrentGreenTotal += theTile.value;
-                    break;
-                default: break;
-            }
+        if(debug){
+            System.out.println("Level values set (red: "+numRedNeeded+", blue: "+numBlueNeeded+", green:"+numGreenNeeded+")");
         }
-
-        numRedNeeded = thisLevelCurrentRedTotal;
-        numBlueNeeded = thisLevelCurrentBlueTotal;
-        numGreenNeeded = thisLevelCurrentGreenTotal;
-
-        System.out.println("Level values set (red: "+numRedNeeded+", blue: "+numBlueNeeded+", green:"+numGreenNeeded+")");
-
-        // The last thing we need is the par value moves for the level, which we will get by moving tiles around. In doing so, we
-        // will also get the actual level we will deliver to the player.
 
         // Now, for every complexity point, let's move a random tile to a non-levelFlagged square according to that tile's rules.
         // Sometimes we might move the same tile a few times, other times we might just move other tiles. Who knows.
 
+        // At this point we have the final level EXCEPT our total scores needed. We'll calc that after we do the movements to create the solution string (levelSolution).
 
+        // Let's compile the map portion of the levelFinal string. Later, we'll compile the moves+number of scores needed for each planet type.
+        // This will only give us the planets, not the asteroids or suns. We'll do that after we've moved stuff around.
+        for(int r = 6; r > -1; r--) {
+            for(int c = 0; c < 7; c++) {
+
+                int position = (r*7)+c; // Where we are in the tile ArrayList
+                int typeToWrite = 0;    // What number to write to the level file
+                // Convert the TileType to a number for the level string
+                // Determine the tile type
+                switch( tile.get(position).type ) {
+                    case NONE:
+                        typeToWrite = 0;
+                        break;
+                    case REDPLANET:
+                        typeToWrite = 1;
+                        break;
+                    case BLUEPLANET:
+                        typeToWrite = 2;
+                        break;
+                    case GREENPLANET:
+                        typeToWrite = 3;
+                        break;
+
+                    default:
+                        typeToWrite = 0;
+                        break;
+                }
+
+                levelFinal[position] = typeToWrite;
+
+                tileNum++;
+            }
+        }
+
+
+        // Now let's move stuff around according to rules to figure out what our required level values will be
         for(int i=0; i<complexity; i++) {
 
             int selectedValue = 0;  // the value of the selected tile
@@ -420,7 +466,9 @@ public class LevelGenerator {
 
             // Select a random tile that is a planet
             boolean selected = false;
-            System.out.println("Looking for a tile for move #"+i);
+            if(debug){
+                System.out.println("Looking for a tile for move #"+i);
+            }
             while( !selected ) {
 
                 int rand = ThreadLocalRandom.current().nextInt(0,48);
@@ -434,9 +482,13 @@ public class LevelGenerator {
                     selectedType = tile.get(rand).type;
                     // We don't have to worry about flagging it in levelFlagged because it already has been flagged
                     selected = true;
-                    System.out.println("> Selecting tile #"+tile.get(rand).tileNum+" ("+tile.get(rand).type+")");
+                    if(debug){
+                        System.out.println("> Selecting tile #"+tile.get(rand).tileNum+" ("+tile.get(rand).type+")");
+                    }
                 } else {
-                    System.out.println("> Skipping tile #"+tile.get(rand).tileNum);
+                    if(debug){
+                        System.out.println("> Skipping tile #"+tile.get(rand).tileNum);
+                    }
                 }
 
             }
@@ -452,7 +504,9 @@ public class LevelGenerator {
 
                 int rand = ThreadLocalRandom.current().nextInt(0, 48);
 
-                System.out.println("Checking tile "+tile.get(rand).tileNum+" for being a good destination for selection "+selectedNum+"...");
+                if(debug){
+                    System.out.println("Checking tile "+tile.get(rand).tileNum+" for being a good destination for selection "+selectedNum+"...");
+                }
 
                 // Great! We found a blank tile. Not so fast, though. Let's check to see if this
                 // new tile has a value different from the old one.
@@ -460,12 +514,16 @@ public class LevelGenerator {
                 // Let's ensure the location hasn't been flagged yet
                 if (levelFlagged[tile.get(rand).tileNum] == 0) {
 
-                    System.out.println("(1/4): Tile #" + tile.get(rand).tileNum + " has not already been flagged...");
+                    if(debug){
+                        System.out.println("(1/4): Tile #" + tile.get(rand).tileNum + " has not already been flagged...");
+                    }
 
                     // Finally, let's make sure we can move according to rules
                     if (canMoveAccordingToRules(tile, tile.get(rand).tileNum)) {
 
-                        System.out.println("(4/4): Tile #" + tile.get(rand).tileNum + " satisfies movement rules!");
+                        if(debug){
+                            System.out.println("(4/4): Tile #" + tile.get(rand).tileNum + " satisfies movement rules!");
+                        }
 
                         // Destination
                         tile.get(rand).type = selectedType;         // Set destination to the selectedType
@@ -533,7 +591,9 @@ public class LevelGenerator {
                 for (int a = 0; a < numAsteroids; a++) {
 
                     int rand = possibleAsteroids.get(ThreadLocalRandom.current().nextInt(0, possibleAsteroids.size()));
-                    System.out.println("Trying to put an asteroid at tile " + rand + "...");
+                    if(debug){
+                        System.out.println("Trying to put an asteroid at tile " + rand + "...");
+                    }
 
                     boolean placed = false;
                     while (!placed) {
@@ -545,7 +605,9 @@ public class LevelGenerator {
                     }
                 }
             } else {
-                System.out.println("I was told to place asteroids, but there's no spot for asteroids!");
+                if(debug){
+                    System.out.println("I was told to place asteroids, but there's no spot for asteroids!");
+                }
             }
         }
 
@@ -589,13 +651,13 @@ public class LevelGenerator {
                     // Check the middle section of the board (i.e., all tiles except edges and corners)
                     if (    // For green planets, it's left, right, and all three on top and three on bottom
                             levelFlagged[a-1] == 0 &&
-                            levelFlagged[a+1] == 0 &&
-                            levelFlagged[a-6] == 0 &&
-                            levelFlagged[a-7] == 0 &&
-                            levelFlagged[a-8] == 0 &&
-                            levelFlagged[a+6] == 0 &&
-                            levelFlagged[a+7] == 0 &&
-                            levelFlagged[a+8] == 0
+                                    levelFlagged[a+1] == 0 &&
+                                    levelFlagged[a-6] == 0 &&
+                                    levelFlagged[a-7] == 0 &&
+                                    levelFlagged[a-8] == 0 &&
+                                    levelFlagged[a+6] == 0 &&
+                                    levelFlagged[a+7] == 0 &&
+                                    levelFlagged[a+8] == 0
                             ) {
                         possibleSuns.add(a);
                     }
@@ -612,7 +674,9 @@ public class LevelGenerator {
                 for (int a = 0; a < numSuns; a++) {
 
                     int rand = possibleSuns.get(ThreadLocalRandom.current().nextInt(0, possibleSuns.size()));
-                    System.out.println("Trying to put a sun at tile " + rand + "...");
+                    if(debug){
+                        System.out.println("Trying to put a sun at tile " + rand + "...");
+                    }
 
                     boolean placed = false;
                     while (!placed) {
@@ -674,20 +738,22 @@ public class LevelGenerator {
                                 tile.get(rand-6).type = TileType.BLOCKED;
                                 tile.get(rand-7).type = TileType.BLOCKED;
                                 tile.get(rand-8).type = TileType.BLOCKED;
-                                
-                                        placed = true;
+
+                                placed = true;
                             }
                         } else {
                             // do nothing
                         }
-                        }
                     }
-                } else {
-                System.out.println("I was told to place suns, but there's no spot for suns!");
+                }
+            } else {
+                if(debug){
+                    System.out.println("I was told to place suns, but there's no spot for suns!");
+                }
             }
         }
 
-        // Finally, let's construct the actual level string
+        // Now only update the asteroids and suns and blocked tiles in the levelFinal
         for(int r = 6; r > -1; r--) {
             for(int c = 0; c < 7; c++) {
 
@@ -696,37 +762,57 @@ public class LevelGenerator {
                 // Convert the TileType to a number for the level string
                 // Determine the tile type
                 switch( tile.get(position).type ) {
-                    case NONE:
-                        typeToWrite = 0;
-                        break;
-                    case REDPLANET:
-                        typeToWrite = 1;
-                        break;
-                    case BLUEPLANET:
-                        typeToWrite = 2;
-                        break;
-                    case GREENPLANET:
-                        typeToWrite = 3;
-                        break;
+
                     case ASTEROID:
                         typeToWrite = 4;
+                        levelFinal[position] = typeToWrite;
                         break;
                     case SUN:
                         typeToWrite = 5;
+                        levelFinal[position] = typeToWrite;
                         break;
                     case BLOCKED:
                         typeToWrite = 9;
+                        levelFinal[position] = typeToWrite;
                         break;
                     default:
-                        typeToWrite = 0;
+
                         break;
                 }
 
-                levelFinal[position] = typeToWrite;
+
 
                 tileNum++;
             }
         }
+
+        // Now update the asteroids and suns in the levelFinal
+
+        // We can get the values needed for each planet color for the level now.
+        // Flush the current scores
+        thisLevelCurrentBlueTotal = 0;
+        thisLevelCurrentRedTotal = 0;
+        thisLevelCurrentGreenTotal = 0;
+
+        // Iterate through each tile and update the current color values
+        for(Tile theTile : tile) {
+            switch(theTile.type) {
+                case REDPLANET:
+                    thisLevelCurrentRedTotal += theTile.value;
+                    break;
+                case BLUEPLANET:
+                    thisLevelCurrentBlueTotal += theTile.value;
+                    break;
+                case GREENPLANET:
+                    thisLevelCurrentGreenTotal += theTile.value;
+                    break;
+                default: break;
+            }
+        }
+
+        numRedNeeded = thisLevelCurrentRedTotal;
+        numBlueNeeded = thisLevelCurrentBlueTotal;
+        numGreenNeeded = thisLevelCurrentGreenTotal;
 
         // Add the final elements of the level string
         levelFinal[49] = numRedNeeded;
@@ -734,8 +820,12 @@ public class LevelGenerator {
         levelFinal[51] = numGreenNeeded;
         levelFinal[52] = numMovesNeeded;
 
-        System.out.println("Level generated!");
-        System.out.println("Creating new level with "+numRedTiles+" red, "+numBlueTiles+" blue, and "+numGreenTiles+" green.");
+        if(debug){
+            System.out.println("Level generated!");
+        }
+        if(debug){
+            System.out.println("Creating new level with "+numRedTiles+" red, "+numBlueTiles+" blue, and "+numGreenTiles+" green.");
+        }
 
         return levelFinal;
     }
