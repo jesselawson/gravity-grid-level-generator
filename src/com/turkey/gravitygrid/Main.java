@@ -110,39 +110,11 @@ public class Main {
                 CreateLevel(6,0,0,10,true,false),
                 CreateLevel(6,0,0,10,true,false),*/
 
-                CreateLevel(3,5,5,5,false,true),
-                CreateLevel(3,6,6,6,false,true),
-                CreateLevel(3,6,6,6,false,true),
-                CreateLevel(3,0,7,8, true, true),
-                CreateLevel(3,7,0,8, true, true),
-
-                CreateLevel(3,8,4,3, true, true),
-                CreateLevel(3,9,6,4, true, true),
-                CreateLevel(4,10,8,5, true, true),
-                CreateLevel(4,9,6,6, true, true),
-                CreateLevel(4,8,4,7, true, true),
-
-                CreateLevel(4,14,0,7, true, true),
-                CreateLevel(4,14,4,7, true, true),
-                CreateLevel(4,14,8,7, true, true),
-                CreateLevel(4,0,14,7, true, true),
-                CreateLevel(4,0,0,6, true, true),
-
-                CreateLevel(4,4,4,7, true, true),
-                CreateLevel(4,5,5,7, true, true),
-                CreateLevel(5,6,6,7, true, true),
-                CreateLevel(5,7,7,7, true, true),
-                CreateLevel(5,6,6,2, true, true),
-
-                CreateLevel(5,6,6,6, true, true),
-                CreateLevel(6,7,7,7, true, true),
-                CreateLevel(6,4,4,4, true, true),
-                CreateLevel(6,2,2,2, true, true),
-                CreateLevel(6,3,3,3, true, true),
-
-
-
-
+                CreateLevel(5,6,0,0,true,true),
+                CreateLevel(5,0,6,0,true,true),
+                CreateLevel(5,0,0,6,true,true),
+                CreateLevel(5,0,5,5,true, true),
+                CreateLevel(5,5,5,5,true, true),
 
 
         };
@@ -154,7 +126,7 @@ public class Main {
                 System.out.print(level[x][a] + ",");
             }
             // print the last one so we can println instead of print
-            System.out.println(level[x][52] + "}, // Level "+(x+1+50));
+            System.out.println(level[x][52] + "}, // Level "+(x+1+95));
         }
 
     }

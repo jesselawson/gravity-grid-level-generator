@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 public class LevelGenerator {
 
-    public boolean debug = false;
+    public boolean debug = true;
 
     /* Board components. Helps differentiate between edges/corners and middle of board. */
     private static final int[] boardMiddle = new int[] { 36,37,38,39,40,29,30,31,32,33,22,23,24,25,26,15,16,17,18,19,8,9,10,11,12 };
@@ -668,10 +668,14 @@ public class LevelGenerator {
 
             // Now, every possibleSuns element is a tile that can be set to an asteroid if we want
 
+
+
             if(possibleSuns.size() > 0) {
-                int numSuns = (possibleSuns.size() == 1 ? 1 : ThreadLocalRandom.current().nextInt(1, possibleSuns.size())); //(int) Math.log((double) ThreadLocalRandom.current().nextInt(1, complexity + 1) * (numRedNeeded + numBlueNeeded + numGreenNeeded)); // gen number of asteroids
+                int numSuns = 1;// (possibleSuns.size() == 1 ? 1 : ThreadLocalRandom.current().nextInt(1, possibleSuns.size())); //(int) Math.log((double) ThreadLocalRandom.current().nextInt(1, complexity + 1) * (numRedNeeded + numBlueNeeded + numGreenNeeded)); // gen number of asteroids
 
                 for (int a = 0; a < numSuns; a++) {
+
+
 
                     int rand = possibleSuns.get(ThreadLocalRandom.current().nextInt(0, possibleSuns.size()));
                     if(debug){
@@ -717,7 +721,7 @@ public class LevelGenerator {
                                     tile.get(rand).type = TileType.SUN;tile.get(rand+6).type = TileType.BLOCKED;tile.get(rand+7).type = TileType.BLOCKED;tile.get(rand+1).type = TileType.BLOCKED;tile.get(rand-6).type = TileType.BLOCKED;tile.get(rand-7).type = TileType.BLOCKED;placed = true; } break;
                                 default: break;
                             }
-                        } else if (IntArrayContains(boardMiddle, a)) {
+                        } else {
                             // Check the middle section of the board (i.e., all tiles except edges and corners)
                             if (    // For green planets, it's left, right, and all three on top and three on bottom
                                     levelFlagged[rand-1] == 0 &&
@@ -741,8 +745,6 @@ public class LevelGenerator {
 
                                 placed = true;
                             }
-                        } else {
-                            // do nothing
                         }
                     }
                 }
