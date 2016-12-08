@@ -29,8 +29,8 @@ public class Main {
 
         int[][] level = new int[][] {
 
-                /*// Galaxy 1
-                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,0,0,1}, // Custom 1
+                // Galaxy 1
+                /*{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,0,0,1}, // Custom 1
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,32,0,0,2}, // Custom 2
                 {0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,9,0,0,1}, // Level 3
                 CreateLevel(2,6,0,0,false,false),
@@ -84,7 +84,7 @@ public class Main {
                 CreateLevel(5,8,8,0,true,false),*/
 
                 // Galaxy 3
-                /*CreateLevel(1,0,0,3,false,false),
+                CreateLevel(1,0,0,3,false,false),
                 CreateLevel(1,0,0,5,true,false),
                 CreateLevel(1,0,0,9,true,false),
                 CreateLevel(2,6,0,6,true,false),
@@ -108,13 +108,13 @@ public class Main {
                 CreateLevel(6,5,7,9,true,false),
                 CreateLevel(6,7,9,5,true,false),
                 CreateLevel(6,0,0,10,true,false),
-                CreateLevel(6,0,0,10,true,false),*/
+                CreateLevel(6,0,0,10,true,false),
 
-                CreateLevel(5,6,0,0,true,true),
+                /*CreateLevel(5,6,0,0,true,true),
                 CreateLevel(5,0,6,0,true,true),
                 CreateLevel(5,0,0,6,true,true),
                 CreateLevel(5,0,5,5,true, true),
-                CreateLevel(5,5,5,5,true, true),
+                CreateLevel(5,5,5,5,true, true),*/
 
 
         };
@@ -126,7 +126,7 @@ public class Main {
                 System.out.print(level[x][a] + ",");
             }
             // print the last one so we can println instead of print
-            System.out.println(level[x][52] + "}, // Level "+(x+1+95));
+            System.out.println(level[x][52] + "}, // Level "+(x+1+50));
         }
 
     }
