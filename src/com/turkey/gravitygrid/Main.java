@@ -11,7 +11,9 @@ public class Main {
 
         levelGenerator = new LevelGenerator();
 
-        level = levelGenerator.GenerateLevel(a,b,c,d,e,f);
+        level = levelGenerator._GenerateLevel(a,b,c,d,e,f);
+
+        // TODO: TEST MANY ITERATIONS OF THE _GENERATELEVEL
 
         return level;
     }
@@ -27,125 +29,24 @@ public class Main {
         int randBlue = ThreadLocalRandom.current().nextInt(1, numPlanetsTable.length-1);
         int randGreen = ThreadLocalRandom.current().nextInt(1, numPlanetsTable.length-1);
 
-        int[][] level = new int[][] {
+        for(int a=0; a<100; a++){
+            int tmp[] = CreateLevel(3,5,5,0,false,false);
+            if(tmp[0] == tmp[1] && tmp[0] > 0){
+                System.out.println("RED FAILED AT "+a);
+            }
 
-                /*// Galaxy 1
-                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,0,0,1}, // Custom 1
-                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,32,0,0,2}, // Custom 2
-                {0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,9,0,0,1}, // Level 3
-                CreateLevel(2,6,0,0,false,false),
-                CreateLevel(2,7,0,0,false,false),
-                CreateLevel(2,8,0,0,false,false),
-                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,2,2,0,4,0,1}, // Level 7 W/ Tutorial Overlay
-                CreateLevel(3,5,8,0,false,false),
-                CreateLevel(4,6,6,0,false,false),
-                CreateLevel(3,7,6,0,false,false),
-                CreateLevel(4,8,7,0,false,false),
-                CreateLevel(3,7,8,0,false,false),
-                CreateLevel(4,9,5,0,false,false),
-                CreateLevel(4,11,6,0,false,false),
-                CreateLevel(4,3,7,0,false,false),
-                CreateLevel(4,0,11,0,false,false),
-                CreateLevel(3,9,4,0,false,false),
-                CreateLevel(4,9,9,0,false,false),
-                CreateLevel(4,8,8,0,false,false),
-                CreateLevel(4,7,7,0,false,false),
-                CreateLevel(4,13,3,0,false,false),
-                CreateLevel(3,3,13,0,false,false),
-                CreateLevel(4,7,14,0,false,false),
-                CreateLevel(4,9,9,0,false,false),
-                CreateLevel(5,6,6,0,false,false),*/
+            if(tmp[2] == tmp[3] && tmp[2] > 0) {
+                System.out.println("BLUE FAILED AT "+a);
+            }
 
-                // Galaxy 2
-                /*CreateLevel(3,2,2,0,true,false),
-                CreateLevel(3,3,3,0,true,false),
-                CreateLevel(3,4,4,0,true,false),
-                CreateLevel(4,5,5,0,true,false),
-                CreateLevel(4,6,6,0,true,false),
-                CreateLevel(4,7,6,0,true,false),
-                CreateLevel(5,8,6,0,true,false),
-                CreateLevel(4,9,7,0,true,false),
-                CreateLevel(4,10,8,0,true,false),
-                CreateLevel(5,11,11,0,true,false),
-                CreateLevel(5,11,0,0,true,false),
-                CreateLevel(4,0,11,0,true,false),
-                CreateLevel(4,7,11,0,true,false),
-                CreateLevel(5,11,7,0,true,false),
-                CreateLevel(5,9,7,0,true,false),
-                CreateLevel(5,9,9,0,true,false),
-                CreateLevel(5,9,9,0,true,false),
-                CreateLevel(5,9,9,0,true,false),
-                CreateLevel(5,9,9,0,true,false),
-                CreateLevel(5,11,4,0,true,false),
-                CreateLevel(5,11,4,0,true,false),
-                CreateLevel(5,4,11,0,true,false),
-                CreateLevel(5,4,11,0,true,false),
-                CreateLevel(5,8,8,0,true,false),
-                CreateLevel(5,8,8,0,true,false),*/
+            if(tmp[4] == tmp[5] && tmp[4] > 0) {
+                System.out.println("GREEN FAILED AT "+a);
+            }
 
-                // Galaxy 3
-                /*CreateLevel(1,0,0,3,false,false),
-                CreateLevel(1,0,0,5,true,false),
-                CreateLevel(1,0,0,9,true,false),
-                CreateLevel(2,6,0,6,true,false),
-                CreateLevel(2,6,0,6,true,false),
-                CreateLevel(2,6,0,6,true,false),
-                CreateLevel(3,7,4,6,true,false),
-                CreateLevel(3,4,7,6,true,false),
-                CreateLevel(3,4,4,7,true,false),
-                CreateLevel(4,5,4,7,true,false),
-                CreateLevel(4,7,0,7,true,false),
-                CreateLevel(4,7,0,7,true,false),
-                CreateLevel(4,6,6,9,true,false),
-                CreateLevel(4,6,5,8,true,false),
-                CreateLevel(5,4,4,4,true,false),
-                CreateLevel(5,5,5,5,true,false),
-                CreateLevel(5,6,6,6,true,false),
-                CreateLevel(5,10,5,5,true,false),
-                CreateLevel(5,5,10,5,true,false),
-                CreateLevel(6,9,7,5,true,false),
-                CreateLevel(6,7,5,9,true,false),
-                CreateLevel(6,5,7,9,true,false),
-                CreateLevel(6,7,9,5,true,false),
-                CreateLevel(6,0,0,10,true,false),
-                CreateLevel(6,0,0,10,true,false),*/
+            //System.out.println("("+tmp[0]+"/"+tmp[1]+") ("+tmp[2]+"/"+tmp[3]+") ("+tmp[4]+"/"+tmp[5]+")");
+        }
 
-                CreateLevel(3,5,5,5,false,true),
-                CreateLevel(3,6,6,6,false,true),
-                CreateLevel(3,6,6,6,false,true),
-                CreateLevel(3,0,7,8, true, true),
-                CreateLevel(3,7,0,8, true, true),
-
-                CreateLevel(3,8,4,3, true, true),
-                CreateLevel(3,9,6,4, true, true),
-                CreateLevel(4,10,8,5, true, true),
-                CreateLevel(4,9,6,6, true, true),
-                CreateLevel(4,8,4,7, true, true),
-
-                CreateLevel(4,14,0,7, true, true),
-                CreateLevel(4,14,4,7, true, true),
-                CreateLevel(4,14,8,7, true, true),
-                CreateLevel(4,0,14,7, true, true),
-                CreateLevel(4,0,0,6, true, true),
-
-                CreateLevel(4,4,4,7, true, true),
-                CreateLevel(4,5,5,7, true, true),
-                CreateLevel(5,6,6,7, true, true),
-                CreateLevel(5,7,7,7, true, true),
-                CreateLevel(5,6,6,2, true, true),
-
-                CreateLevel(5,6,6,6, true, true),
-                CreateLevel(6,7,7,7, true, true),
-                CreateLevel(6,4,4,4, true, true),
-                CreateLevel(6,2,2,2, true, true),
-                CreateLevel(6,3,3,3, true, true),
-
-
-
-
-
-
-        };
+        /*
 
         // Print the levels
         for(int x=0; x<level.length; x++) {
@@ -155,7 +56,7 @@ public class Main {
             }
             // print the last one so we can println instead of print
             System.out.println(level[x][52] + "}, // Level "+(x+1+50));
-        }
+        }*/
 
     }
 }
