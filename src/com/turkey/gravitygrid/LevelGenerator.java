@@ -5,11 +5,13 @@ package com.turkey.gravitygrid;
  */
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class LevelGenerator {
 
-    public boolean debug = false;
+    public boolean debug = true;
+    public boolean debug2 = false;
 
     /* Board components. Helps differentiate between edges/corners and middle of board. */
     private static final int[] boardMiddle = new int[] { 36,37,38,39,40,29,30,31,32,33,22,23,24,25,26,15,16,17,18,19,8,9,10,11,12 };
@@ -77,7 +79,7 @@ public class LevelGenerator {
                 // Extract the type of the selected tile so we can assign the appropriate rules to the planet type
                 selectedType = theTile.type;
                 selectedNum = theTile.tileNum;
-                if(debug){
+                if(debug2){
                     System.out.println("(2/4): canMoveAccordingToRules: Tile #"+selectedNum+" ("+selectedType+") is selected. Trying to move to "+destinationTileNum+"...");
                 }
                 break findSelected;
@@ -89,9 +91,15 @@ public class LevelGenerator {
         switch (selectedType) {
 
             case REDPLANET:
+                if(debug2) {
+                    System.out.println("case REDPLANET:");
+                }
 
                 // First check the body of the board. If the body doesn't return true, try the edges and corners (the most complicated of the logic because we check them each individually).
                 if (IntArrayContains(boardMiddle, destinationTileNum)) {
+                    if(debug2) {
+                        System.out.println("Inside boardMiddle:");
+                    }
                     // Check the middle section of the board (i.e., all tiles except edges and corners)
                     if (
                             (GoodMoveVerified(tile,destinationTileNum + 8, selectedType, selectedNum))
@@ -99,13 +107,18 @@ public class LevelGenerator {
                                     || (GoodMoveVerified(tile,destinationTileNum - 6, selectedType, selectedNum))
                                     || (GoodMoveVerified(tile,destinationTileNum - 8, selectedType, selectedNum))) {
                         outcome = true;
-                        if(debug){
+                        if(debug2){
                             System.out.println("destinationTileNum: " + destinationTileNum + ". SelectedNum: " + selectedNum);
                         }
                         return outcome; // Leave this function immediately!
                     }
 
                 } else {
+
+                    if(debug2) {
+                        System.out.println("Not inside boardMiddle:");
+                    }
+
                     // If we're here, then we're on an edge or corner tile. We need to check these manually... Previous attempts at complicated if-else statements have proven unwieldy and confusing.
                     // So why not this switch in a switch?
 
@@ -137,6 +150,9 @@ public class LevelGenerator {
                         default: break;
                     }
 
+                    if(debug2){
+                        System.out.println("destinationTileNum: " + destinationTileNum + ". SelectedNum: " + selectedNum);
+                    }
                     return outcome; // Break immediately because there's no point in continuing
                 }
 
@@ -151,7 +167,7 @@ public class LevelGenerator {
                                     || (GoodMoveVerified(tile,destinationTileNum + 7, selectedType, selectedNum))
                                     || (GoodMoveVerified(tile,destinationTileNum - 7, selectedType, selectedNum))) {
                         outcome = true;
-                        if(debug){
+                        if(debug2){
                             System.out.println("destinationTileNum: " + destinationTileNum + ". SelectedNum: " + selectedNum);
                         }
                         return outcome; // Leave this function immediately!
@@ -209,7 +225,7 @@ public class LevelGenerator {
                                     && !GoodMoveVerified(tile,destinationTileNum + 8, selectedType, selectedNum)
                             ) {
                         outcome = true;
-                        if(debug){
+                        if(debug2){
                             System.out.println("destinationTileNum: " + destinationTileNum + ". SelectedNum: " + selectedNum);
                         }
                         return outcome; // Leave this function immediately!
@@ -252,7 +268,7 @@ public class LevelGenerator {
 
                 break;
             default:
-                if(debug){
+                if(debug2){
                     System.out.println("canMoveAccordingToRules: No Planet Type understood!");
                 }
                 break;
@@ -289,8 +305,10 @@ public class LevelGenerator {
     public boolean HistoricValue(ArrayList<Integer> list, int value) {
         boolean result = false;
 
-        if(list.contains(value)) {
-            result = true;
+        for(Integer i : list) {
+            if(i.equals(value)) {
+                result = true;
+            }
         }
 
         return result;
@@ -1122,10 +1140,6 @@ public class LevelGenerator {
         // Let's calculate the planet values so that we don't repeat them in future moves
         int scores[] = calculateScores(tile);
 
-        if(debug) {
-            System.out.println("New historic values added: "+scores[0]+", "+scores[1]+", "+scores[2]);
-        }
-
         originalRedTotal = scores[0];
         originalBlueTotal = scores[1];
         originalGreenTotal = scores[2];
@@ -1133,6 +1147,10 @@ public class LevelGenerator {
         historicRedValues.add(scores[0]);
         historicBlueValues.add(scores[1]);
         historicGreenValues.add(scores[2]);
+
+        if(debug) {
+            System.out.println("New historic values added: "+scores[0]+", "+scores[1]+", "+scores[2]);
+        }
 
         // Also, we should update our value totals that we'll use below during our complexity movements
         // Flush the current scores
@@ -1182,10 +1200,26 @@ public class LevelGenerator {
 
 
         // Now let's move stuff around according to rules to figure out what our required level values will be
-        int i=0;
-        boolean goodLevel = false;
-        while(goodLevel == false) {
 
+        boolean goodLevel = false;
+
+        boolean redHandled = false;
+        boolean blueHandled = false;
+        boolean greenHandled = false;
+
+        for(int i=0; i < complexity; i++) {
+
+            // We need a way to check each type of planet to ensure that at least one of each has been moved.
+            // If we don't have any of those types of planets, mark them as handled so that we can skip over them.
+            if (redWeight == 0) {
+                redHandled = true;
+            }
+            if (blueWeight == 0) {
+                blueHandled = true;
+            }
+            if (greenWeight == 0) {
+                greenHandled = true;
+            }
 
             int selectedValue = 0;  // the value of the selected tile
             int selectedNum = 0;    // the tileNum of the selected tile
@@ -1194,31 +1228,91 @@ public class LevelGenerator {
 
             // Select a random tile that is a planet
             boolean selected = false;
-            if(debug){
-                System.out.println("(Move #"+i+") Looking for a tile for move #"+i);
+            if (debug) {
+                System.out.println("(Move #" + i + ") Looking for a tile for move #" + i);
             }
-            while( !selected ) {
+            while (!selected) {
 
-                int rand = ThreadLocalRandom.current().nextInt(0,48);
+                int rand = ThreadLocalRandom.current().nextInt(0, 48);
 
-                // Check if this is a planet tile
-                if( tile.get(rand).type != TileType.NONE ) {
+                // Additional check here to make sure that we have at least moved one of each type of planet we have, just so we aren't having a
+                // map with, say, Par 3, red blue and green planets, and accidentally move reds all three times (and thus have the level start with
+                // blue and green completed.
 
-                    tile.get(rand).isSelected = true;
-                    selectedValue = tile.get(rand).value;
-                    selectedNum = tile.get(rand).tileNum;
-                    selectedType = tile.get(rand).type;
-                    // We don't have to worry about flagging it in levelFlagged because it already has been flagged
-                    selected = true;
-                    if(debug){
-                        System.out.println("(Move #"+i+") > Selecting tile #"+tile.get(rand).tileNum+" ("+tile.get(rand).type+")");
-                    }
-                } else {
-                    if(debug){
-                        System.out.println("(Move #"+i+") > Skipping tile #"+tile.get(rand).tileNum);
+                if (tile.get(rand).type != TileType.NONE) {
+
+                    // If we've handled all our planets, go ahead and just select away
+
+                    if (redHandled && blueHandled && greenHandled) {
+                        // Now process a tile after we've selected all the other ones
+                        tile.get(rand).isSelected = true;
+                        selectedValue = tile.get(rand).value;
+                        selectedNum = tile.get(rand).tileNum;
+                        selectedType = tile.get(rand).type;
+                        // We don't have to worry about flagging it in levelFlagged because it already has been flagged
+                        selected = true;
+                        if (debug) {
+                            System.out.println("(Move #" + i + ") > Selecting tile #" + tile.get(rand).tileNum + " (" + tile.get(rand).type + ")");
+                        }
+
+
+                        // If we haven't handled red and this is a red planet..
+                    } else if (!redHandled && tile.get(rand).type == TileType.REDPLANET) {
+                        redHandled = true;
+                        tile.get(rand).isSelected = true;
+                        selectedValue = tile.get(rand).value;
+                        selectedNum = tile.get(rand).tileNum;
+                        selectedType = tile.get(rand).type;
+                        // We don't have to worry about flagging it in levelFlagged because it already has been flagged
+                        selected = true;
+                        if (debug) {
+                            System.out.println("(Move #" + i + ") > Selecting tile #" + tile.get(rand).tileNum + " (" + tile.get(rand).type + ")");
+                        }
+                    } else if (!blueHandled && tile.get(rand).type == TileType.BLUEPLANET) {
+                        blueHandled = true;
+                        tile.get(rand).isSelected = true;
+                        selectedValue = tile.get(rand).value;
+                        selectedNum = tile.get(rand).tileNum;
+                        selectedType = tile.get(rand).type;
+                        // We don't have to worry about flagging it in levelFlagged because it already has been flagged
+                        selected = true;
+                        if (debug) {
+                            System.out.println("(Move #" + i + ") > Selecting tile #" + tile.get(rand).tileNum + " (" + tile.get(rand).type + ")");
+                        }
+                    } else if (!greenHandled && tile.get(rand).type == TileType.GREENPLANET) {
+                        greenHandled = true;
+                        tile.get(rand).isSelected = true;
+                        selectedValue = tile.get(rand).value;
+                        selectedNum = tile.get(rand).tileNum;
+                        selectedType = tile.get(rand).type;
+                        // We don't have to worry about flagging it in levelFlagged because it already has been flagged
+                        selected = true;
+                        if (debug) {
+                            System.out.println("(Move #" + i + ") > Selecting tile #" + tile.get(rand).tileNum + " (" + tile.get(rand).type + ")");
+                        }
+                    } else {
+                        if (debug) {
+                            System.out.println("(Move #" + i + ") > Skipping tile #" + tile.get(rand).tileNum + " (" + tile.get(rand).type + ") due to select rules.");
+                        }
                     }
                 }
+            } // End of selection
 
+            // Loop through all tiles and see if we can move to that tile. If so, let's add it to possibleDestinations. Then, we simply choose a random destination.
+            ArrayList<Integer> possibleDestinations = new ArrayList<Integer>();
+            for (int a = 0; a < 49; a++) {
+                if (canMoveAccordingToRules(tile, tile.get(a).tileNum)) {
+                    if (levelFlagged[tile.get(a).tileNum] == 0) {
+                        possibleDestinations.add(a);
+                        //if (debug2) {
+                          //  System.out.println("Adding " + a + " as possible destination.");
+                        //}
+                    }
+                }
+            }
+
+            if (debug2) {
+                System.out.println("Found " + possibleDestinations.size() + " possible destinations.");
             }
 
             // At this point, we have selected a random a tile that is not of type NONE.
@@ -1230,156 +1324,164 @@ public class LevelGenerator {
 
             int tries = 0;
 
-            while( !goodDestinationFound && tries < 20) {
+            ArrayList<Tile> temp = new ArrayList<>(tile); // Save a copy of our current tile arraylist
+            Collections.copy(temp, tile);
 
-                tries++;
+            while (!goodDestinationFound) {
 
-                int rand = ThreadLocalRandom.current().nextInt(0, 48);
+                // Before we start this party, 'continue;' if we don't have any possible destinations
 
-                if(debug){
-                    System.out.println("(Move #"+i+") [Attempt #"+tries+"] Checking tile "+tile.get(rand).tileNum+" for being a good destination for selection "+selectedNum+"...");
-                }
+                if (possibleDestinations.size() != 0) {
 
-                // Great! We found a blank tile. Not so fast, though. Let's check to see if this
-                // new tile has a value different from the old one.
-
-                // Let's ensure the location hasn't been flagged yet
-                if (levelFlagged[tile.get(rand).tileNum] == 0) {
+                    int randPosition = possibleDestinations.size() == 1 ? 0 : ThreadLocalRandom.current().nextInt(0, possibleDestinations.size() - 1);
+                    int rand = possibleDestinations.get(randPosition); // Get the tileNum at the randPosition in the arraylist
 
                     if (debug) {
-                        System.out.println("(1/4): Tile #" + tile.get(rand).tileNum + " has not already been flagged...");
+                        System.out.println("(Move #" + i + ") [Attempt #" + tries + "] Trying to move the " + tile.get(selectedNum).type + " at tile " + tile.get(selectedNum).tileNum + " to tile " + rand + "...");
                     }
 
-                    // temporary copy of the tile array for later
-                    ArrayList<Tile> temp = tile;
+                    // Destination
+                    tile.get(rand).type = selectedType;         // Set destination to the selectedType
 
-                    // Finally, let's make sure we can move according to rules
-                    if (canMoveAccordingToRules(tile, tile.get(rand).tileNum)) {
+                    // Previous Location
+                    tile.get(selectedNum).type = TileType.NONE; // Set the old one to none
+                    tile.get(selectedNum).isSelected = false; // Set the destination to none
+
+                    // Calc what the new values would be if we used the tile at rand
+                    // Reset the current values
+                    int hypotheticalScores[] = calculateScores(tile);
+
+                    thisLevelCurrentRedTotal = hypotheticalScores[0];
+                    thisLevelCurrentBlueTotal = hypotheticalScores[1];
+                    thisLevelCurrentGreenTotal = hypotheticalScores[2];
+
+                    if(debug){
+                        System.out.println("(Move #" + i + ") [Attempt #" + tries + "] This would create ("+thisLevelCurrentRedTotal+"/"+originalRedTotal+"), ("+thisLevelCurrentBlueTotal+"/"+originalBlueTotal+"), ("+thisLevelCurrentGreenTotal+"/"+originalGreenTotal+")...");
+                    }
+
+                    // Check if moving to this tile would put us back to a historic value
+                    boolean duplicatedScore = false;
+
+                    // What type of planet are we dealing with?
+                    switch (selectedType) {
+                        case REDPLANET:
+                            if (redWeight > 0) {
+                                if (HistoricValue(historicRedValues, thisLevelCurrentRedTotal)) {
+                                    duplicatedScore = true;
+                                    System.out.println("(Move #" + i + ") [Attempt #" + tries + "] "+thisLevelCurrentRedTotal+" was found in historic red values!");
+                                }
+                            }
+                            break;
+                        case BLUEPLANET:
+                            if (blueWeight > 0) {
+                                if (HistoricValue(historicBlueValues, thisLevelCurrentBlueTotal)) {
+                                    duplicatedScore = true;
+                                    System.out.println("(Move #" + i + ") [Attempt #" + tries + "] "+thisLevelCurrentRedTotal+" was found in historic blue values!");
+                                }
+                            }
+                            break;
+                        case GREENPLANET:
+                            if (greenWeight > 0) {
+                                if (HistoricValue(historicGreenValues, thisLevelCurrentGreenTotal)) {
+                                    duplicatedScore = true;
+                                    System.out.println("(Move #" + i + ") [Attempt #" + tries + "] "+thisLevelCurrentRedTotal+" was found in historic green values!");
+                                }
+                            }
+                            break;
+                        default:
+
+                            System.out.println("SOMETHING WENT WRONG: I DONT UNDERSTAND WHAT KIND OF PLANET i AM SUPPOSED TO DEAL WITH");
+                            break;
+                    }
+                    if (duplicatedScore) {
+                        // No good destination found AND lets reverse our decisions
+
+                        Collections.copy(tile, temp);
+
+                        i = i - 1;
+
+                        goodDestinationFound = false;
 
                         if (debug) {
-                            System.out.println("(4/4): Tile #" + tile.get(rand).tileNum + " satisfies movement rules!");
+                            System.out.println("Aborting due to historic value.");
                         }
+                    } else {
 
-                        // Destination
-                        tile.get(rand).type = selectedType;         // Set destination to the selectedType
+                        levelFlagged[tile.get(rand).tileNum] = 1;   // Flag the location as dirty
 
-                        // Previous Location
-                        tile.get(selectedNum).type = TileType.NONE; // Set the old one to none
-                        tile.get(selectedNum).isSelected = false; // Set the destination to none
 
                         // Reset the current values
                         int newValues[] = calculateScores(tile);
+
+                        historicRedValues.add(newValues[0]);
+                        historicBlueValues.add(newValues[1]);
+                        historicGreenValues.add(newValues[2]);
 
                         thisLevelCurrentBlueTotal = newValues[0];
                         thisLevelCurrentRedTotal = newValues[1];
                         thisLevelCurrentGreenTotal = newValues[2];
 
-                        if(debug){
-                            System.out.println("New historic values added: "+scores[0]+", "+scores[1]+", "+scores[2]);
-                        }
-
-                        // Check if moving to this tile would put us back to a historic value
-                        boolean duplicatedScore = false;
-                        switch(tile.get(rand).type) {
-                            case REDPLANET:
-                                if(HistoricValue(historicRedValues, thisLevelCurrentRedTotal)) {
-                                    duplicatedScore = true;
-                                }
-                                break;
-                            case BLUEPLANET:
-                                if(HistoricValue(historicBlueValues, thisLevelCurrentBlueTotal)) {
-                                    duplicatedScore = true;
-                                }
-                                break;
-                            case GREENPLANET:
-                                if(HistoricValue(historicGreenValues, thisLevelCurrentGreenTotal)) {
-                                    duplicatedScore = true;
-                                }
-                                break;
-                            default: break;
-                        }
-                        if(duplicatedScore) {
-                            // No good destination found AND lets reverse our decisions
-                            tile = temp;
-                            i = i - 1;
-                            if (debug) {
-                                System.out.println("Aborting due to historic value.");
-                            }
-                        } else {
-
-                            levelFlagged[tile.get(rand).tileNum] = 1;   // Flag the location as dirty
-
-                            historicRedValues.add(newValues[0]);
-                            historicBlueValues.add(newValues[1]);
-                            historicGreenValues.add(newValues[2]);
-
-                            goodDestinationFound = true;
-                        }
-
-                        //if (thisLevelCurrentBlueTotal == numBlueNeeded || thisLevelCurrentRedTotal == numRedNeeded || thisLevelCurrentGreenTotal == numGreenNeeded) {
-                        //goodDestinationFound = false; // Reset this if now that we've moved we have the same damn value as we began with.
-                        //}
-
-                    } else {
-                        if(debug){
-                            System.out.println("Nope! Can't move according to rules.");
-                        }
-                        continue;
+                        goodDestinationFound = true;
                     }
-
                 } else {
-                    if(debug) {
-                        System.out.println("Nope! This tile was flagged.");
-                    }
+                    // There are no possible destinations (size()=0), so what do we do? We skip this one.
                     continue;
                 }
-            }
 
-            if(tries < 20) {
-                numMovesNeeded++; // Increment our par moves counter... I guess this is just equal to the complexity, isn't it, Jesse?
-            } else {
-                if(debug) {
-                    System.out.println("Couldn't find a destination after "+i+" tries, so skipping this one.");
+                if (tries < 20) {
+                    numMovesNeeded++; // Increment our par moves counter... I guess this is just equal to the complexity, isn't it, Jesse?
+                } else {
+                    if (debug) {
+                        System.out.println("Couldn't find a destination after " + i + " tries, so skipping this one.");
 
-                    i = i-1; // give us another complexity
+                        i = i - 1; // give us another complexity
 
+                    }
                 }
-            }
 
-            // Finally, check to make sure ALL of the values are different from the start. If not, add another complexity
-            boolean redsAreGood = false;
-            boolean bluesAreGood = false;
-            boolean greensAreGood = false;
+                // Finally, check to make sure ALL of the values are different from the start. If not, add another complexity
+                boolean redsAreGood = false;
+                boolean bluesAreGood = false;
+                boolean greensAreGood = false;
 
-            if(numRedNeeded > 0) {
-                if(numRedNeeded != originalRedTotal) {
-                    redsAreGood = true;
+                if (numRedNeeded > 0) {
+                    if (numRedNeeded != originalRedTotal) {
+                        redsAreGood = true;
+                        System.out.println("Reds are good!");
+                    }
+                } else {
+                    redsAreGood = false;
                 }
-            } else { redsAreGood = true; }
 
-            if(numBlueNeeded > 0) {
-                if(thisLevelCurrentBlueTotal != originalBlueTotal) {
-                    bluesAreGood = true;
+                if (numBlueNeeded > 0) {
+                    if (thisLevelCurrentBlueTotal != originalBlueTotal) {
+                        bluesAreGood = true;
+                    }
+                } else {
+                    bluesAreGood = false;
                 }
-            } else { bluesAreGood = true; }
 
-            if(numGreenNeeded > 0) {
-                if(thisLevelCurrentGreenTotal != originalGreenTotal) {
-                    greensAreGood = true;
+                if (numGreenNeeded > 0) {
+                    if (thisLevelCurrentGreenTotal != originalGreenTotal) {
+                        greensAreGood = true;
+                    }
+                } else {
+                    greensAreGood = false;
                 }
-            } else { greensAreGood = true; }
 
-            // if we're above our complexity and the values are different, break the loop
-            if(numMovesNeeded >= complexity && redsAreGood && bluesAreGood && greensAreGood){
-                goodLevel = true;
-            } else {
-                goodLevel = false;
-                i--;
-            }
+                // if we're above our complexity and the values are different, break the loop
+                if (numMovesNeeded >= complexity && redsAreGood && bluesAreGood && greensAreGood) {
+                    goodLevel = true;
+                } else {
+                    goodLevel = false;
+                    i--;
+                }
 
-            i++;
+                i++;
+
+
+            } // end while (!goodDestinationFound)
         }
-
         // At this point, we have all the things we need for our level. We should go through and look for places to stick an asteroid and
         // a sun, or both, or combinations.
 
@@ -1646,9 +1748,21 @@ public class LevelGenerator {
         if(debug){
             System.out.println("Level generated!");
             System.out.println("Creating new level with "+numRedTiles+" red, "+numBlueTiles+" blue, and "+numGreenTiles+" green.");
-            System.out.println("Red original/needed: "+originalRedTotal+"/"+numRedNeeded);
+            System.out.println("Original/Needed: ("+originalRedTotal+"/"+numRedNeeded+"), ("+originalBlueTotal+"/"+numBlueNeeded+"), ("+originalGreenTotal+"/"+numGreenNeeded+")");
             System.out.print("Historic red: ");
             for(Integer j : historicRedValues) {
+                System.out.print(j+",");
+            }
+            System.out.println("");
+
+            System.out.print("Historic blue: ");
+            for(Integer j : historicBlueValues) {
+                System.out.print(j+",");
+            }
+            System.out.println("");
+
+            System.out.print("Historic green: ");
+            for(Integer j : historicGreenValues) {
                 System.out.print(j+",");
             }
             System.out.println("");

@@ -11,9 +11,7 @@ public class Main {
 
         levelGenerator = new LevelGenerator();
 
-        level = levelGenerator._GenerateLevel(a,b,c,d,e,f);
-
-        // TODO: TEST MANY ITERATIONS OF THE _GENERATELEVEL
+        level = levelGenerator._GenerateLevel(a, b, c, d, e, f);
 
         return level;
     }
@@ -30,17 +28,16 @@ public class Main {
         int randGreen = ThreadLocalRandom.current().nextInt(1, numPlanetsTable.length-1);
 
         for(int a=0; a<100; a++){
-            int tmp[] = CreateLevel(3,5,5,0,false,false);
+            int tmp[] = CreateLevel(3,11,4,5,true,true);
+
             if(tmp[0] == tmp[1] && tmp[0] > 0){
-                System.out.println("RED FAILED AT "+a);
-            }
-
-            if(tmp[2] == tmp[3] && tmp[2] > 0) {
-                System.out.println("BLUE FAILED AT "+a);
-            }
-
-            if(tmp[4] == tmp[5] && tmp[4] > 0) {
-                System.out.println("GREEN FAILED AT "+a);
+                System.out.println("RED FAILED AT "+a+": "+tmp[0]+"/"+tmp[1]);
+            } else if(tmp[2] == tmp[3] && tmp[2] > 0) {
+                System.out.println("BLUE FAILED AT "+a+": "+tmp[2]+"/"+tmp[3]);
+            } else if(tmp[4] == tmp[5] && tmp[4] > 0) {
+                System.out.println("GREEN FAILED AT "+a+": "+tmp[4]+"/"+tmp[5]);
+            } else {
+                System.out.println("Generated OK level "+a+": ("+tmp[0]+"/"+tmp[1]+"), ("+tmp[2]+"/"+tmp[3]+"), "+tmp[4]+"/"+tmp[5]+")");
             }
 
             //System.out.println("("+tmp[0]+"/"+tmp[1]+") ("+tmp[2]+"/"+tmp[3]+") ("+tmp[4]+"/"+tmp[5]+")");
