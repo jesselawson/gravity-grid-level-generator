@@ -11,25 +11,39 @@ public class Main {
 
         levelGenerator = new LevelGenerator();
 
-        level = levelGenerator._GenerateLevel(a, b, c, d, e, f);
+        boolean goodResult = false;
+        int mytmp[] = null;
+        while(!goodResult) {
+            int tmp[] = level = levelGenerator._GenerateLevel(a, b, c, d, e, f);
 
-        return level;
+            if(tmp[0] == tmp[1] && tmp[0] > 0){
+
+            } else if(tmp[2] == tmp[3] && tmp[2] > 0) {
+
+            } else if(tmp[4] == tmp[5] && tmp[4] > 0) {
+
+            } else {
+                goodResult = true;
+                mytmp = new int[tmp.length];
+                mytmp = tmp;
+                //System.out.println("Generated OK level "+a+": ("+tmp[0]+"/"+tmp[1]+"), ("+tmp[2]+"/"+tmp[3]+"), "+tmp[4]+"/"+tmp[5]+")");
+            }
+            //System.out.println("("+tmp[0]+"/"+tmp[1]+") ("+tmp[2]+"/"+tmp[3]+") ("+tmp[4]+"/"+tmp[5]+")");
+        }
+
+        if(goodResult) {
+            return mytmp;
+        }
+
+        return mytmp;
     }
 
-    public static final int[] numPlanetsTable = new int[] {1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6,6,7,7,7,7,7,7,7,7,7,8,8,8,8,8,8,8,9,9,9,9,9,9,9,10,10,10,10,10,10,11,11,11,11,11,11,12,12,12,12,12,13,13,13,13};
 
-    public static final int[] complexityTable = new int[] {3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,5,5,5,5,5,6,6,6,6,7,7,7,7,8,8,8};
 
     public static void main(String[] args) {
 
-        int randComplexity = ThreadLocalRandom.current().nextInt(1, complexityTable.length-1);
-        int randRed = ThreadLocalRandom.current().nextInt(1, numPlanetsTable.length-1);
-        int randBlue = ThreadLocalRandom.current().nextInt(1, numPlanetsTable.length-1);
-        int randGreen = ThreadLocalRandom.current().nextInt(1, numPlanetsTable.length-1);
-
         for(int a=0; a<100; a++){
-            int tmp[] = CreateLevel(3,11,4,5,true,true);
-
+            int tmp[] = CreateLevel(5,11,4,5,true,true);
             if(tmp[0] == tmp[1] && tmp[0] > 0){
                 System.out.println("RED FAILED AT "+a+": "+tmp[0]+"/"+tmp[1]);
             } else if(tmp[2] == tmp[3] && tmp[2] > 0) {
@@ -39,21 +53,8 @@ public class Main {
             } else {
                 System.out.println("Generated OK level "+a+": ("+tmp[0]+"/"+tmp[1]+"), ("+tmp[2]+"/"+tmp[3]+"), "+tmp[4]+"/"+tmp[5]+")");
             }
-
             //System.out.println("("+tmp[0]+"/"+tmp[1]+") ("+tmp[2]+"/"+tmp[3]+") ("+tmp[4]+"/"+tmp[5]+")");
         }
-
-        /*
-
-        // Print the levels
-        for(int x=0; x<level.length; x++) {
-            System.out.print("{");
-            for (int a = 0; a < 52; a++) {
-                System.out.print(level[x][a] + ",");
-            }
-            // print the last one so we can println instead of print
-            System.out.println(level[x][52] + "}, // Level "+(x+1+50));
-        }*/
 
     }
 }
